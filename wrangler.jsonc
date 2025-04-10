@@ -18,7 +18,7 @@
 	},
 	"workers_dev": false,
 	"routes": [
-		"https://tommygpt.com/*"
+		"https://tommygpt.com"
 	]
 	/**
 	 * Smart Placement

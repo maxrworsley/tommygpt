@@ -6,7 +6,12 @@ import './App.css'
 
 function App() {
   const [count, setCount] = useState(0)
-  const [name, setName] = useState('unknown')
+
+  const aiFunction = async () => {
+    await fetch('/api/')
+      .then((res) => res.json() as Promise<{ aiResponse: string }>)
+      .then((data) => console.log(data.aiResponse))
+  }
 
   return (
     <>
@@ -35,14 +40,9 @@ function App() {
       </div>
       <div className='card'>
         <button
-          onClick={async () => {
-            fetch('/api/')
-              .then((res) => res.json() as Promise<{ aiResponse: string }>)
-              .then((data) => setName(data.aiResponse))
-          }}
+          onClick={aiFunction}
           aria-label='get name'
         >
-          Name from API is: {name}
         </button>
         <p>
           Edit <code>worker/index.ts</code> to change the name
