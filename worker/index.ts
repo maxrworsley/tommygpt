@@ -9,7 +9,7 @@ export default {
     if (url.pathname.startsWith("/api/")) {
       try {
         // Parse the request body to get user input
-        const { userInput } = await request.json();
+        const { userInput } = await request.json() as { userInput: string };
 
         // Call Workers AI endpoint with dynamic user input
         const aiResponse = await env.AI.run('@cf/meta/llama-2-7b-chat-int8', {
