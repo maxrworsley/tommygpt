@@ -16,10 +16,10 @@
 	"ai": {
 		"binding": "AI",
 	},
-	"workers_dev": false,
-	"routes": [
-		"https://tommygpt.com"
-	]
+	// "workers_dev": false,
+	// "routes": [
+	// 	"https://tommygpt.com"
+	// ]
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
