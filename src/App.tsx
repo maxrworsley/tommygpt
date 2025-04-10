@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './App.css'
+import TommyImage from './assets/Tommy.png'
 
 function App() {
   const [chatResponse, setChatResponse] = useState('')
@@ -28,6 +29,7 @@ function App() {
   return (
     <>
       <h1>TommyGPT</h1>
+      <img src={TommyImage} alt="Tommy" className="tommy-image" />
       <div className='card'>
         <input
           type='text'
