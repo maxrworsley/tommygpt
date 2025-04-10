@@ -1,56 +1,47 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import cloudflareLogo from './assets/Cloudflare_Logo.svg'
 import './App.css'
 
 function App() {
   const [count, setCount] = useState(0)
+  const [chatResponse, setChatResponse] = useState('')
+  const [userInput, setUserInput] = useState('')
+
+  type AIResponse = {
+    response: string
+  }
 
   const aiFunction = async () => {
-    await fetch('/api/')
-      .then((res) => res.json() as Promise<{ aiResponse: string }>)
-      .then((data) => console.log(data.aiResponse))
+    await fetch('/api/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userInput }),
+    })
+      .then((res) => res.json() as Promise<{ aiResponse: AIResponse }>)
+      .then((data) => setChatResponse(data.aiResponse.response))
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUserInput(e.target.value)
   }
 
   return (
     <>
-      <div>
-        <a href='https://vite.dev' target='_blank'>
-          <img src={viteLogo} className='logo' alt='Vite logo' />
-        </a>
-        <a href='https://react.dev' target='_blank'>
-          <img src={reactLogo} className='logo react' alt='React logo' />
-        </a>
-        <a href='https://workers.cloudflare.com/' target='_blank'>
-          <img src={cloudflareLogo} className='logo cloudflare' alt='Cloudflare logo' />
-        </a>
-      </div>
-      <h1>Vite + React + Cloudflare</h1>
+      <h1>TommyGPT</h1>
       <div className='card'>
-        <button
-          onClick={() => setCount((count) => count + 1)}
-          aria-label='increment'
-        >
-          count is {count}
+        <input
+          type='text'
+          placeholder='Type something...'
+          onChange={handleInputChange}
+          value={userInput}
+          aria-label='user input'
+        />
+        <button onClick={aiFunction} aria-label='submit input'>
+          Submit
         </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+        <p>TommyGPT: {chatResponse}</p>
       </div>
-      <div className='card'>
-        <button
-          onClick={aiFunction}
-          aria-label='get name'
-        >
-        </button>
-        <p>
-          Edit <code>worker/index.ts</code> to change the name
-        </p>
-      </div>
-      <p className='read-the-docs'>
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }

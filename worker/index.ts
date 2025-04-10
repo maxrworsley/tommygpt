@@ -7,12 +7,21 @@ export default {
     const url = new URL(request.url);
 
     if (url.pathname.startsWith("/api/")) {
-      // Call Workers AI endpoint
       try {
+        // Parse the request body to get user input
+        const { userInput } = await request.json();
+
+        // Call Workers AI endpoint with dynamic user input
         const aiResponse = await env.AI.run('@cf/meta/llama-2-7b-chat-int8', {
           messages: [
-            { role: 'system', content: 'You are a helpful assistant.' },
-            { role: 'user', content: 'Hello, who are you?' }
+            { 
+              role: 'system', 
+              content: `
+                 Your name is Tommy chaplin. You're a 25 year old man from Stevenage. You now live in peterborough. You drive a BMW. You went to Loughborough University.
+                 You're curently in on a business trip in america. You have curly hair. You work in Emissions for Catterpillar.
+              `.trim()
+            },
+            { role: 'user', content: userInput } // Use the provided user input
           ]
         });
 
