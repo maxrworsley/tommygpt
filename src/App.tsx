@@ -35,10 +35,10 @@ function App() {
       </div>
       <div className='card'>
         <button
-          onClick={() => {
+          onClick={async () => {
             fetch('/api/')
-              .then((res) => res.json() as Promise<{ name: string }>)
-              .then((data) => setName(data.name))
+              .then((res) => res.json() as Promise<{ aiResponse: string }>)
+              .then((data) => setName(data.aiResponse))
           }}
           aria-label='get name'
         >
