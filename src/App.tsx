@@ -45,6 +45,13 @@ function App() {
     setUserInput(e.target.value)
   }
 
+  const resetChat = () => {
+    setMessages([]) // Clear the chat history
+    setTommyImage(TommyImage) // Reset the image to the default
+    setChatResponse('') // Clear the AI response
+    setUserInput('') // Clear the input field
+  }
+
   useEffect(() => {
     if (!chatResponse) return
 
@@ -53,7 +60,6 @@ function App() {
     const remainingResponse = rest.join(' ')
 
     // Determine the image based on the first word
-
     if (firstWord.toLowerCase().includes('happy')) {
       setTommyImage(TommyAiHappy)
     } else if (firstWord.toLowerCase().includes('sad')) {
@@ -101,7 +107,6 @@ function App() {
                 }
               }}
               value={userInput}
-              aria-label="user input"
               className="chat-input"
             />
             <button
@@ -113,6 +118,13 @@ function App() {
               {loading ? '...' : 'Send'}
             </button>
           </div>
+          <button
+            onClick={resetChat}
+            className="reset-chat-button"
+            aria-label="reset chat"
+          >
+            Reset Chat
+          </button>
         </div>
       </div>
     </>
