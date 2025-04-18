@@ -1,45 +1,179 @@
+/* Root container */
 #root {
-	max-width: 1280px;
-	margin: 0 auto;
-	padding: 2rem;
-	text-align: center;
+  margin: 0 auto;
+  padding: 2rem;
+  width: 100vw; /* Full viewport width */
+  height: 100vh; /* Full viewport height */
+  display: flex;
+  flex-direction: column; /* Stack elements vertically */
+  align-items: center;
+  justify-content: flex-start; /* Align content to the top */
+  text-align: center;
+  background-color: #1e1e2f; /* Dark background */
 }
 
 .logo {
-	height: 6em;
-	padding: 1.5em;
-	will-change: filter;
-	transition: filter 300ms;
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
 }
 .logo:hover {
-	filter: drop-shadow(0 0 2em #646cffaa);
+  filter: drop-shadow(0 0 2em #646cffaa);
 }
 .logo.react:hover {
-	filter: drop-shadow(0 0 2em #61dafbaa);
+  filter: drop-shadow(0 0 2em #61dafbaa);
 }
 .logo.cloudflare:hover {
-	filter: drop-shadow(0 0 2em #f6821faa);
+  filter: drop-shadow(0 0 2em #f6821faa);
 }
 
 @keyframes logo-spin {
-	from {
-		transform: rotate(0deg);
-	}
-	to {
-		transform: rotate(360deg);
-	}
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
-	a:nth-of-type(2) .logo {
-		animation: logo-spin infinite 20s linear;
-	}
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
 }
 
 .card {
-	padding: 2em;
+  padding: 2em;
 }
 
 .read-the-docs {
-	color: #888;
+  color: #888;
+}
+
+/* Spinner styling */
+.spinner {
+  border: 4px solid #444455;
+  border-top: 4px solid #4caf50; /* Green accent */
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+  margin: 10px auto;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Heading styling */
+.app-heading {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  font-family: 'Roboto', sans-serif;
+  color: #ffffff; /* Light text color */
+}
+
+/* Main container for the image and chat window */
+.app-container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+  width: 75%; /* Take up 75% of the page width */
+  height: 75%; /* Take up 75% of the page height */
+  background-color: #2a2a40; /* Slightly lighter dark background */
+  border-radius: 15px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5); /* Softer shadow */
+}
+
+/* Image styling */
+.tommy-image {
+  width: 25%; /* Image takes up 25% of the container width */
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Subtle shadow */
+}
+
+/* Chat container styling */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 70%; /* Chat window takes up 70% of the container width */
+  height: 100%; /* Full height of the container */
+  border: 1px solid #3a3a4f; /* Dark border */
+  border-radius: 10px;
+  background-color: #2e2e3e; /* Slightly lighter dark background */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  overflow: hidden; /* Prevent content overflow */
+}
+
+/* Chat input container at the top */
+.chat-input-container {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #3a3a4f;
+  background-color: #2a2a40; /* Dark background for input area */
+}
+
+/* Input field styling */
+.chat-input {
+  flex: 1;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #444455;
+  border-radius: 5px;
+  outline: none;
+  margin-right: 10px;
+  background-color: #1e1e2f; /* Darker background for input */
+  color: #ffffff; /* Light text color */
+}
+
+.chat-input:focus {
+  border-color: #4caf50; /* Green accent for focus */
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
+/* Submit button styling */
+.chat-submit-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #ffffff;
+  background-color: #4caf50; /* Green accent */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.chat-submit-button:disabled {
+  background-color: #555566; /* Neutral gray for disabled state */
+  cursor: not-allowed;
+}
+
+.chat-submit-button:hover:not(:disabled) {
+  background-color: #388e3c; /* Darker green for hover state */
+}
+
+/* Chat display area for responses */
+.chat-display {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto; /* Enable scrolling for long responses */
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  color: #ffffff; /* Light text color */
+  background-color: #2e2e3e; /* Slightly lighter dark background */
+  height: 200px; /* Set a fixed height */
+  max-height: 200px; /* Prevent it from growing beyond this height */
+  box-sizing: border-box; /* Include padding in the height calculation */
 }
