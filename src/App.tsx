@@ -7,18 +7,23 @@ import TommyAiAngry from './assets/TommyAi_Angry.png'
 
 function App() {
   const [chatResponse, setChatResponse] = useState('')
-  const [displayedResponse, setDisplayedResponse] = useState('') // For typewriter effect
   const [userInput, setUserInput] = useState('')
   const [tommyImage, setTommyImage] = useState(TommyImage)
   const [loading, setLoading] = useState(false)
+  const [messages, setMessages] = useState<{ sender: 'user' | 'ai'; text: string }[]>([]) // Chat history
 
   type AIResponse = {
     response: string
   }
 
   const aiFunction = async () => {
+    if (!userInput.trim()) return // Prevent empty submissions
+
+    // Add the user's message to the chat history
+    setMessages((prev) => [...prev, { sender: 'user', text: userInput }])
+    setUserInput('') // Clear the input field
+
     setLoading(true)
-    setDisplayedResponse('') // Reset displayedResponse before starting the typewriter effect
     await fetch('/api/', {
       method: 'POST',
       headers: {
@@ -27,7 +32,12 @@ function App() {
       body: JSON.stringify({ userInput }),
     })
       .then((res) => res.json() as Promise<{ aiResponse: AIResponse }>)
-      .then((data) => setChatResponse(data.aiResponse.response))
+      .then((data) => {
+        const response = data.aiResponse.response
+        setChatResponse(response)
+        // Add the AI's response to the chat history
+        setMessages((prev) => [...prev, { sender: 'ai', text: response }])
+      })
       .finally(() => setLoading(false))
   }
 
@@ -36,51 +46,60 @@ function App() {
   }
 
   useEffect(() => {
-    switch (true) {
-      case chatResponse.startsWith('[Happy]'):
-        setTommyImage(TommyAiHappy)
-        break
-      case chatResponse.startsWith('[Sad]'):
-        setTommyImage(TommyAiSad)
-        break
-      case chatResponse.startsWith('[Angry]'):
-        setTommyImage(TommyAiAngry)
-        break
-      default:
-        setTommyImage(TommyImage)
+    if (!chatResponse) return
+
+    // Extract the first word from the AI response
+    const [firstWord, ...rest] = chatResponse.split(' ')
+    const remainingResponse = rest.join(' ')
+
+    // Determine the image based on the first word
+
+    if (firstWord.toLowerCase().includes('happy')) {
+      setTommyImage(TommyAiHappy)
+    } else if (firstWord.toLowerCase().includes('sad')) {
+      setTommyImage(TommyAiSad)
+    } else if (firstWord.toLowerCase().includes('angry')) {
+      setTommyImage(TommyAiAngry)
+    } else {
+      setTommyImage(TommyImage)
     }
-  }, [chatResponse])
 
-  // Typewriter effect
-  useEffect(() => {
-    if (!chatResponse) return // Prevent running the effect if chatResponse is empty
-
-    let index = 0
-    const trimmedResponse = chatResponse.split(' ').slice(1).join(' ')
-    setDisplayedResponse('') // Reset displayedResponse when chatResponse changes
-    const interval = setInterval(() => {
-      if (index < trimmedResponse.length) {
-        setDisplayedResponse((prev) => prev + trimmedResponse[index-1])
-        index++
-      } else {
-        clearInterval(interval)
-      }
-    }, 50) // Adjust typing speed here (50ms per character)
-
-    return () => clearInterval(interval) // Cleanup interval on unmount or new response
+    // Update the AI message in the chat history without the first word
+    setMessages((prev) =>
+      prev.map((message, index) =>
+        index === prev.length - 1 && message.sender === 'ai'
+          ? { ...message, text: remainingResponse }
+          : message
+      )
+    )
   }, [chatResponse])
 
   return (
     <>
-      <h1 className="app-heading">TommyGPT</h1> {/* Keep the heading at the top */}
+      <h1 className="app-heading">TommyGPT</h1>
       <div className="app-container">
         <img src={tommyImage} alt="Tommy" className="tommy-image" />
         <div className="chat-container">
+          <div className="chat-display">
+            {messages.map((message, index) => (
+              <div
+                key={index}
+                className={`chat-message ${message.sender === 'user' ? 'user-message' : 'ai-message'}`}
+              >
+                {message.text}
+              </div>
+            ))}
+          </div>
           <div className="chat-input-container">
             <input
               type="text"
               placeholder="Type your message..."
               onChange={handleInputChange}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  aiFunction() // Trigger the submit function when Enter is pressed
+                }
+              }}
               value={userInput}
               aria-label="user input"
               className="chat-input"
@@ -93,9 +112,6 @@ function App() {
             >
               {loading ? '...' : 'Send'}
             </button>
-          </div>
-          <div className="chat-display">
-            <p>TommyGPT: {displayedResponse}</p> {/* Chat response display */}
           </div>
         </div>
       </div>

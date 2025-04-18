@@ -1,15 +1,20 @@
+body {
+	background-color: #1e1e2f; /* Dark background */
+}
+
 /* Root container */
 #root {
   margin: 0 auto;
-  padding: 2rem;
-  width: 100vw; /* Full viewport width */
-  height: 100vh; /* Full viewport height */
+  padding: 1rem;
+  width: 100vh; /* Full width */
+  height: 100vh; /* Full height */
   display: flex;
   flex-direction: column; /* Stack elements vertically */
   align-items: center;
   justify-content: flex-start; /* Align content to the top */
   text-align: center;
   background-color: #1e1e2f; /* Dark background */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 .logo {
@@ -87,16 +92,19 @@
   justify-content: center;
   gap: 20px;
   padding: 20px;
-  width: 75%; /* Take up 75% of the page width */
-  height: 75%; /* Take up 75% of the page height */
+  width: 100%; /* Full width */
+  max-width: 1200px; /* Limit the width on larger screens */
+  height: auto; /* Allow height to adjust based on content */
   background-color: #2a2a40; /* Slightly lighter dark background */
   border-radius: 15px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5); /* Softer shadow */
+  flex-wrap: wrap; /* Allow wrapping for smaller screens */
 }
 
 /* Image styling */
 .tommy-image {
   width: 25%; /* Image takes up 25% of the container width */
+  max-width: 200px; /* Limit the size on larger screens */
   height: auto;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Subtle shadow */
@@ -108,7 +116,8 @@
   flex-direction: column;
   justify-content: flex-start;
   width: 70%; /* Chat window takes up 70% of the container width */
-  height: 100%; /* Full height of the container */
+  max-width: 600px; /* Limit the width on larger screens */
+  height: auto; /* Allow height to adjust based on content */
   border: 1px solid #3a3a4f; /* Dark border */
   border-radius: 10px;
   background-color: #2e2e3e; /* Slightly lighter dark background */
@@ -167,13 +176,70 @@
 /* Chat display area for responses */
 .chat-display {
   flex: 1;
-  padding: 20px;
+  padding: 10px;
   overflow-y: auto; /* Enable scrolling for long responses */
   font-family: 'Roboto', sans-serif;
   font-size: 16px;
   color: #ffffff; /* Light text color */
   background-color: #2e2e3e; /* Slightly lighter dark background */
-  height: 200px; /* Set a fixed height */
-  max-height: 200px; /* Prevent it from growing beyond this height */
-  box-sizing: border-box; /* Include padding in the height calculation */
+  box-sizing: border-box; /* Include padding in height calculation */
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Add spacing between messages */
+}
+
+/* User message styling */
+.user-message {
+  align-self: flex-end;
+  background-color: #4caf50; /* Green for user messages */
+  color: #ffffff;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 70%;
+  word-wrap: break-word;
+}
+
+/* AI message styling */
+.ai-message {
+  align-self: flex-start;
+  background-color: #444455; /* Darker background for AI messages */
+  color: #ffffff;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 70%;
+  word-wrap: break-word;
+}
+
+/* Media query for mobile devices */
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column; /* Stack the image and chat window vertically */
+    width: 90%; /* Take up more width on smaller screens */
+    height: auto; /* Allow height to adjust based on content */
+    gap: 10px; /* Reduce gap between elements */
+  }
+
+  .tommy-image {
+    width: 50%; /* Reduce image size on mobile */
+    max-width: 150px; /* Limit the size on smaller screens */
+    margin: 0 auto 10px; /* Center the image horizontally and add spacing below */
+    display: block; /* Ensure the image behaves as a block element */
+  }
+
+  .chat-container {
+    width: 100%; /* Chat window takes full width on mobile */
+  }
+
+  .chat-input-container {
+    flex-direction: column; /* Stack input and button vertically */
+    gap: 10px; /* Add spacing between input and button */
+  }
+
+  .chat-display {
+    min-height: 150px; /* Allow the chat box to grow dynamically */
+    max-height: 50vh; /* Limit the height to 50% of the viewport */
+    overflow-y: auto; /* Enable scrolling for long responses */
+    padding: 10px; /* Add padding for better readability */
+    box-sizing: border-box; /* Include padding in height calculation */
+  }
 }
