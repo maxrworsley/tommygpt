@@ -1,5 +1,6 @@
 export interface Env {
   AI: import('@cloudflare/ai').Ai; // Cloudflare AI binding
+  DB: D1Database; // D1 binding for SQLite
 }
 
 export default {
@@ -8,10 +9,42 @@ export default {
 
     if (url.pathname.startsWith("/api/")) {
       try {
-        // Parse the request body to get user input
-        const { userInput } = await request.json() as { userInput: string };
+        // Parse the request body to get user input and conversation ID
+        const { userInput, conversationId, userName } = await request.json() as {
+          userInput: string;
+          conversationId: string;
+          userName: string;
+        };
 
-        // Call Workers AI endpoint with dynamic user input
+        // Retrieve the conversation history from the database
+        const conversation = await env.DB.prepare(
+          "SELECT messages FROM conversations WHERE id = ?"
+        )
+          .bind(conversationId)
+          .first<{ messages: string }>();
+
+        let messages: { sender: string; text: string }[] = [];
+
+        if (conversation) {
+          // Parse the existing messages if the conversation exists
+          messages = JSON.parse(conversation.messages);
+        } else {
+          // If no conversation exists, create a new one
+          await env.DB.prepare(
+            "INSERT INTO conversations (id, user_name, messages) VALUES (?, ?, ?)"
+          )
+            .bind(conversationId, userName, JSON.stringify([]))
+            .run();
+        }
+
+        // Add the user's message to the conversation history
+        messages.push({ sender: "user", text: userInput });
+
+        console.log("conversationId:", conversationId);
+        console.log("userName:", userName);
+        console.log("messages:", messages);
+
+        // Call Workers AI endpoint with the conversation history
         const aiResponse = await env.AI.run('@cf/meta/llama-2-7b-chat-int8', {
           messages: [
             { 
@@ -28,9 +61,38 @@ export default {
                  responses but not every response needs to include all this information. Only include relevant information.
               `.trim()
             },
-            { role: 'user', content: userInput } // Use the provided user input
+            ...messages.map((msg) => ({ role: msg.sender === "user" ? "user" : "assistant", content: msg.text })),
+            { role: "user", content: userInput }
           ]
         });
+
+        // Add the AI's response to the conversation history
+        let aiText = "";
+        if (typeof aiResponse === "string") {
+          aiText = aiResponse;
+        } else if (aiResponse instanceof ReadableStream) {
+          const reader = aiResponse.getReader();
+          const decoder = new TextDecoder();
+          const chunks: string[] = [];
+          let done = false;
+
+          while (!done) {
+            const { value, done: streamDone } = await reader.read();
+            if (value) {
+              chunks.push(decoder.decode(value, { stream: !streamDone }));
+            }
+            done = streamDone;
+          }
+          aiText = chunks.join("");
+        }
+        messages.push({ sender: "ai", text: aiText });
+
+        // Update the conversation history in the database
+        await env.DB.prepare(
+          "UPDATE conversations SET messages = ? WHERE id = ?"
+        )
+          .bind(JSON.stringify(messages), conversationId)
+          .run();
 
         return Response.json({
           name: "Cloudflare",

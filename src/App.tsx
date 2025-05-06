@@ -14,9 +14,6 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [messages, setMessages] = useState<{ sender: 'user' | 'ai'; text: string }[]>([]) // Chat history
 
-  type AIResponse = {
-    response: string
-  }
 
   const handleNameSubmit = () => {
     if (userName.trim()) {
@@ -49,14 +46,24 @@ function App() {
       },
       body: JSON.stringify({ userInput: fullMessage }),
     })
-      .then((res) => res.json() as Promise<{ aiResponse: AIResponse }>)
-      .then((data) => {
-        const response = data.aiResponse.response
-        setChatResponse(response)
-        // Add the AI's response to the chat history
-        setMessages((prev) => [...prev, { sender: 'ai', text: response }])
+      .then((res) => {
+        console.log("API Response Status:", res.status); // Log the status code
+        return res.json();
       })
-      .finally(() => setLoading(false))
+      .then((data) => {
+        console.log("API Response Data:", data); // Log the full response data
+        const response = data.aiResponse?.response; // Safely access aiResponse
+        if (!response) {
+          throw new Error("AI response is undefined");
+        }
+        setChatResponse(response);
+        // Add the AI's response to the chat history
+        setMessages((prev) => [...prev, { sender: 'ai', text: response }]);
+      })
+      .catch((error) => {
+        console.error("Error fetching AI response:", error); // Log any errors
+      })
+      .finally(() => setLoading(false));
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

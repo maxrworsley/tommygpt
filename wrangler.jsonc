@@ -16,6 +16,14 @@
 	"ai": {
 		"binding": "AI",
 	},
+	"d1_databases": [
+		{
+			"binding": "DB", // The binding name used in your Worker
+			"database_name": "tommygpt-conversations", // The name of your D1 database
+			"database_id": "a6d5e9d8-8e9e-4a01-916c-d1a4e90d2ce1" // Replace with your actual database ID
+		}
+	]
+	
 	// "workers_dev": false,
 	// "routes": [
 	// 	"https://tommygpt.com"
