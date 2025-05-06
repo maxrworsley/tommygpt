@@ -210,6 +210,45 @@ body {
   word-wrap: break-word;
 }
 
+/* Theme input styling */
+.theme-input {
+  padding: 10px;
+  font-size: 16px;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  width: 100%;
+  max-width: 300px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.theme-input:focus {
+  outline: none;
+  border-color: #0078d7; /* Match the theme color */
+  box-shadow: 0 0 5px rgba(0, 120, 215, 0.5);
+}
+
+/* Theme button styling */
+.theme-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #0078d7; /* Match the theme color */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.theme-button:hover {
+  background-color: #005bb5; /* Darker shade for hover */
+}
+
+.theme-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
 /* Media query for mobile devices */
 @media (max-width: 768px) {
   .app-container {

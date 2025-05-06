@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './App.css'
 import TommyImage from './assets/Tommy.png'
 import TommyAiHappy from './assets/TommyAi_Happy.png'
@@ -14,13 +14,14 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [messages, setMessages] = useState<{ sender: 'user' | 'ai'; text: string }[]>([]) // Chat history
 
-  type AIResponse = {
-    response: string
-  }
+  const messageInputRef = useRef<HTMLInputElement>(null) // Ref for the message input box
 
   const handleNameSubmit = () => {
     if (userName.trim()) {
       setIsNameSet(true) // Mark the name as set
+      setTimeout(() => {
+        messageInputRef.current?.focus() // Automatically focus the message input box
+      }, 0)
     }
   }
 
@@ -49,7 +50,7 @@ function App() {
       },
       body: JSON.stringify({ userInput: fullMessage }),
     })
-      .then((res) => res.json() as Promise<{ aiResponse: AIResponse }>)
+      .then((res) => res.json() as Promise<{ aiResponse: { response: string } }>)
       .then((data) => {
         const response = data.aiResponse.response
         setChatResponse(response)
@@ -111,9 +112,17 @@ function App() {
               placeholder="Enter your name..."
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
-              className="name-input"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleNameSubmit(); // Trigger the submit function when Enter is pressed
+                }
+              }}
+              className="name-input theme-input" // Add a class for consistent styling
             />
-            <button onClick={handleNameSubmit} className="name-submit-button">
+            <button
+              onClick={handleNameSubmit}
+              className="name-submit-button theme-button" // Add a class for consistent styling
+            >
               Start Chat
             </button>
           </div>
@@ -142,6 +151,7 @@ function App() {
                     }
                   }}
                   value={userInput}
+                  ref={messageInputRef} // Attach the ref to the message input box
                   className="chat-input"
                 />
                 <button
