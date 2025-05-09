@@ -5,6 +5,8 @@ import TommyAiHappy from './assets/TommyAi_Happy.png'
 import TommyAiSad from './assets/TommyAi_Sad.png'
 import TommyAiAngry from './assets/TommyAi_Angry.png'
 import TommyAiShocked from './assets/TommyAI_Shocked.png'
+import TommyAiFlirty from './assets/TommyAi_Flirty.png'
+import html2canvas from 'html2canvas'; // Import html2canvas
 
 function App() {
   const [chatResponse, setChatResponse] = useState('')
@@ -13,7 +15,7 @@ function App() {
   const [isNameSet, setIsNameSet] = useState(false) // Track if the name has been set
   const [tommyImage, setTommyImage] = useState(TommyImage)
   const [loading, setLoading] = useState(false)
-  const [messages, setMessages] = useState<{ sender: 'user' | 'ai'; text: string }[]>([]) // Chat history
+  const [messages, setMessages] = useState<{ sender: 'user' | 'ai'; text: string; image?: string }[]>([]) // Chat history
 
   const messageInputRef = useRef<HTMLInputElement>(null) // Ref for the message input box
 
@@ -53,10 +55,33 @@ function App() {
     })
       .then((res) => res.json() as Promise<{ aiResponse: { response: string } }>)
       .then((data) => {
-      const response = data.aiResponse.response
-      setChatResponse(response)
-      // Add the AI's response to the chat history
-      setMessages((prev) => [...prev, { sender: 'ai', text: response }])
+      const response = data.aiResponse.response;
+
+      // Extract the first word from the AI response
+      const [firstWord, ...rest] = response.split(' ');
+      const remainingResponse = rest.join(' ');
+
+      // Determine the image based on the first word
+      let currentImage = TommyImage;
+      if (firstWord.toLowerCase().includes('happy')) {
+        currentImage = TommyAiHappy;
+      } else if (firstWord.toLowerCase().includes('sad')) {
+        currentImage = TommyAiSad;
+      } else if (firstWord.toLowerCase().includes('angry')) {
+        currentImage = TommyAiAngry;
+      } else if (firstWord.toLowerCase().includes('shocked')) {
+        currentImage = TommyAiShocked;
+      } else if (firstWord.toLowerCase().includes('flirty')) {
+        currentImage = TommyAiFlirty;
+      }
+
+      // Add the AI's response to the chat history with the corresponding image
+      setMessages((prev) => [
+        ...prev,
+        { sender: 'ai', text: remainingResponse, image: currentImage },
+      ]);
+
+      setChatResponse(response);
       })
       .catch((error) => {
       console.error("Error fetching AI response:", error)
@@ -77,6 +102,39 @@ function App() {
     setUserName('') // Clear the user's name
   }
 
+  const downloadConversation = async () => {
+    const chatContainer = document.querySelector('.chat-display'); // Select the chat container
+    if (!chatContainer) return;
+  
+    // Temporarily remove the scrollable behavior and set the background color
+    const originalOverflow = (chatContainer as HTMLElement).style.overflow;
+    const originalBackgroundColor = (chatContainer as HTMLElement).style.backgroundColor;
+    (chatContainer as HTMLElement).style.overflow = 'visible';
+    (chatContainer as HTMLElement).style.backgroundColor = getComputedStyle(chatContainer).backgroundColor || '#ffffff'; // Ensure the background color is set
+  
+    // Use html2canvas to capture the entire chat container
+    const canvas = await html2canvas(chatContainer as HTMLElement, {
+      scrollX: 0,
+      scrollY: 0,
+      width: chatContainer.scrollWidth, // Ensure full width is captured
+      height: chatContainer.scrollHeight, // Ensure full height is captured
+      backgroundColor: "#2e2e3e", // Let the element's background color be used
+    });
+  
+    // Restore the original styles
+    (chatContainer as HTMLElement).style.overflow = originalOverflow;
+    (chatContainer as HTMLElement).style.backgroundColor = originalBackgroundColor;
+  
+    const dataURL = canvas.toDataURL('image/png'); // Convert the canvas to a PNG image
+  
+    // Create a temporary link to download the image
+    const link = document.createElement('a');
+    link.href = dataURL;
+    const date = new Date();
+    link.download = userName + '-conversation-' + date.toISOString() + '.png'; // Set the file name
+    link.click(); // Trigger the download
+  };
+
   useEffect(() => {
     if (!chatResponse) return
 
@@ -93,6 +151,8 @@ function App() {
       setTommyImage(TommyAiAngry)
     } else if (firstWord.toLowerCase().includes('shocked')) {
       setTommyImage(TommyAiShocked)
+    } else if (firstWord.toLowerCase().includes('flirty')) {
+      setTommyImage(TommyAiFlirty)
     } else {
       setTommyImage(TommyImage)
     }
@@ -140,9 +200,24 @@ function App() {
                 {messages.map((message, index) => (
                   <div
                     key={index}
-                    className={`chat-message ${message.sender === 'user' ? 'user-message' : 'ai-message'}`}
+                    className={`chat-message-container ${
+                      message.sender === 'user' ? 'user-message-container' : 'ai-message-container'
+                    }`}
                   >
-                    {message.text}
+                    {message.sender === 'ai' && message.image && (
+                      <img
+                        src={message.image}
+                        alt="Tommy"
+                        className="profile-photo"
+                      />
+                    )}
+                    <div
+                      className={`chat-message ${
+                        message.sender === 'user' ? 'user-message' : 'ai-message'
+                      }`}
+                    >
+                      {message.text}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -175,6 +250,13 @@ function App() {
                 aria-label="reset chat"
               >
                 Reset Chat
+              </button>
+              <button
+                onClick={downloadConversation}
+                className="download-chat-button"
+                aria-label="download chat"
+              >
+                Download Chat
               </button>
             </div>
           </>
