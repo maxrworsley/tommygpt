@@ -4,6 +4,7 @@ import TommyImage from './assets/Tommy.png'
 import TommyAiHappy from './assets/TommyAi_Happy.png'
 import TommyAiSad from './assets/TommyAi_Sad.png'
 import TommyAiAngry from './assets/TommyAi_Angry.png'
+import TommyAiShocked from './assets/TommyAI_Shocked.png'
 
 function App() {
   const [chatResponse, setChatResponse] = useState('')
@@ -46,16 +47,19 @@ function App() {
     await fetch('/api/', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+      'Content-Type': 'application/json',
       },
       body: JSON.stringify({ userInput: fullMessage }),
     })
       .then((res) => res.json() as Promise<{ aiResponse: { response: string } }>)
       .then((data) => {
-        const response = data.aiResponse.response
-        setChatResponse(response)
-        // Add the AI's response to the chat history
-        setMessages((prev) => [...prev, { sender: 'ai', text: response }])
+      const response = data.aiResponse.response
+      setChatResponse(response)
+      // Add the AI's response to the chat history
+      setMessages((prev) => [...prev, { sender: 'ai', text: response }])
+      })
+      .catch((error) => {
+      console.error("Error fetching AI response:", error)
       })
       .finally(() => setLoading(false))
   }
@@ -87,6 +91,8 @@ function App() {
       setTommyImage(TommyAiSad)
     } else if (firstWord.toLowerCase().includes('angry')) {
       setTommyImage(TommyAiAngry)
+    } else if (firstWord.toLowerCase().includes('shocked')) {
+      setTommyImage(TommyAiShocked)
     } else {
       setTommyImage(TommyImage)
     }
